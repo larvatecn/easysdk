@@ -103,7 +103,7 @@ class File
 
         $mime = strstr($fileInfo->buffer($stream), ';', true);
 
-        return isset(self::$extensionMap[$mime]) ? self::$extensionMap[$mime] : $ext;
+        return self::$extensionMap[$mime] ?? $ext;
     }
 
     /**

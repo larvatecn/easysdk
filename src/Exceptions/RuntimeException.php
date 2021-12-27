@@ -6,5 +6,4 @@ namespace Larva\EasySDK\Exceptions;
 
 class RuntimeException extends Exception
 {
-
 }

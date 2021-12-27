@@ -1,4 +1,5 @@
 <?php
+
 namespace Larva\EasySDK;
 
 use Larva\EasySDK\Contracts\Arrayable;

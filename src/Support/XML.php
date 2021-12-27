@@ -32,7 +32,7 @@ class XML
     /**
      * XML encode.
      *
-     * @param mixed  $data
+     * @param mixed $data
      * @param string $root
      * @param string $item
      * @param string $attr
@@ -113,7 +113,7 @@ class XML
     /**
      * Array to XML.
      *
-     * @param array  $data
+     * @param array $data
      * @param string $item
      * @param string $id
      *
