@@ -1,0 +1,8 @@
+composer.lock
+vendor
+.php_cs.cache
+tags
+.idea
+.phpunit.result.cache
+tests/TC.php
+tests/TTC.php
