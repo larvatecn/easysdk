@@ -36,7 +36,7 @@
             "Larva\\EasySDK\\": "src/"
         },
         "files": [
-            "src/Kernel/Helpers.php"
+            "src/Helpers.php"
         ]
     }
 }
