@@ -28,7 +28,7 @@ function data_get($data, $key, $default = null)
     }
 }
 
-function data_to_array($data)
+function data_to_array($data): array
 {
     switch (true) {
         case is_array($data):
