@@ -6,6 +6,10 @@
     "sdk"
   ],
   "license": "MIT",
+  "support": {
+    "issues": "https://github.com/larvatech/easysdk/issues",
+    "source": "https://github.com/larvatech/easysdk"
+  },
   "minimum-stability": "dev",
   "authors": [
     {
@@ -22,7 +26,7 @@
     }
   ],
   "require": {
-    "php": ">=7.4",
+    "php": "^7.4|^8.0",
     "ext-curl": "*",
     "ext-fileinfo": "*",
     "ext-json": "*",
@@ -49,5 +53,9 @@
   "scripts": {
     "check-style": "vendor/bin/php-cs-fixer fix --using-cache=no --diff --config=.php-cs-fixer.php --dry-run --ansi",
     "fix-style": "vendor/bin/php-cs-fixer fix --using-cache=no --config=.php-cs-fixer.php --ansi"
+  },
+  "scripts-descriptions": {
+    "check-style": "Run style checks (only dry run - no fixing!).",
+    "fix-style": "Run style checks and fix violations."
   }
 }
