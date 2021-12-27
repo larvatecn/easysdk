@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Larva\EasySDK;
 
 use GuzzleHttp\Exception\GuzzleException;
-use HttpException;
+use Larva\EasySDK\Exceptions\HttpException;
 use Larva\EasySDK\Contracts\AccessTokenInterface;
 use Larva\EasySDK\Exceptions\InvalidArgumentException;
 use Larva\EasySDK\Exceptions\InvalidConfigException;
@@ -146,16 +146,13 @@ abstract class AccessToken implements AccessTokenInterface
     public function refresh(): AccessTokenInterface
     {
         $this->getToken(true);
-
         return $this;
     }
 
     /**
      * @param array $credentials
      * @param bool $toArray
-     *
      * @return ResponseInterface|Collection|array|object|string
-     *
      * @throws HttpException
      * @throws InvalidConfigException
      * @throws InvalidArgumentException|GuzzleException
