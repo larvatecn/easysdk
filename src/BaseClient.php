@@ -45,7 +45,7 @@ class BaseClient
     /**
      * BaseClient constructor.
      *
-     * @param ServiceContainer                    $app
+     * @param ServiceContainer $app
      * @param AccessTokenInterface|null $accessToken
      */
     public function __construct(ServiceContainer $app, AccessTokenInterface $accessToken = null)
@@ -58,7 +58,7 @@ class BaseClient
      * GET request.
      *
      * @param string $url
-     * @param array  $query
+     * @param array $query
      *
      * @return ResponseInterface|Collection|array|object|string
      *
@@ -74,7 +74,7 @@ class BaseClient
      * POST request.
      *
      * @param string $url
-     * @param array  $data
+     * @param array $data
      *
      * @return ResponseInterface|Collection|array|object|string
      *
@@ -90,8 +90,8 @@ class BaseClient
      * JSON request.
      *
      * @param string $url
-     * @param array  $data
-     * @param array  $query
+     * @param array $data
+     * @param array $query
      *
      * @return ResponseInterface|Collection|array|object|string
      *
@@ -107,9 +107,9 @@ class BaseClient
      * Upload file.
      *
      * @param string $url
-     * @param array  $files
-     * @param array  $form
-     * @param array  $query
+     * @param array $files
+     * @param array $form
+     * @param array $query
      *
      * @return ResponseInterface|Collection|array|object|string
      *
@@ -123,7 +123,7 @@ class BaseClient
 
         if (isset($form['filename'])) {
             $headers = [
-                'Content-Disposition' => 'form-data; name="media"; filename="'.$form['filename'].'"'
+                'Content-Disposition' => 'form-data; name="media"; filename="' . $form['filename'] . '"'
             ];
         }
 
@@ -169,8 +169,8 @@ class BaseClient
     /**
      * @param string $url
      * @param string $method
-     * @param array  $options
-     * @param bool   $returnRaw
+     * @param array $options
+     * @param bool $returnRaw
      *
      * @return ResponseInterface|Collection|array|object|string
      *
@@ -193,7 +193,7 @@ class BaseClient
     /**
      * @param string $url
      * @param string $method
-     * @param array  $options
+     * @param array $options
      *
      * @return Response
      *
@@ -260,15 +260,12 @@ class BaseClient
                 // Limit the number of retries to 2
                 if ($retries < $this->app->config->get('http.max_retries', 1) && $response && $body = $response->getBody()) {
                     // Retry on server errors
-                    $response = json_decode($body, true);
-                    if (!empty($response['errcode']) && in_array(abs($response['errcode']), [40001, 40014, 42001], true)) {
+                    if (in_array(abs($response->getStatusCode()), [400, 401], true)) {
                         $this->accessToken->refresh();
                         $this->app['logger']->debug('Retrying with refreshed access token.');
-
                         return true;
                     }
                 }
-
                 return false;
             },
             function () {

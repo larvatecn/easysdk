@@ -73,7 +73,7 @@ abstract class AccessToken implements AccessTokenInterface
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws InvalidConfigException
      * @throws InvalidArgumentException
-     * @throws RuntimeException
+     * @throws RuntimeException|GuzzleException
      */
     public function getRefreshedToken(): array
     {
@@ -89,7 +89,7 @@ abstract class AccessToken implements AccessTokenInterface
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws InvalidConfigException
      * @throws InvalidArgumentException
-     * @throws RuntimeException
+     * @throws RuntimeException|GuzzleException
      */
     public function getToken(bool $refresh = false): array
     {
@@ -158,9 +158,9 @@ abstract class AccessToken implements AccessTokenInterface
      *
      * @throws HttpException
      * @throws InvalidConfigException
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException|GuzzleException
      */
-    public function requestToken(array $credentials, $toArray = false)
+    public function requestToken(array $credentials, bool $toArray = false)
     {
         $response = $this->sendRequest($credentials);
         $result = json_decode($response->getBody()->getContents(), true);
