@@ -5,12 +5,13 @@
     "easy",
     "sdk"
   ],
+  "type": "library",
   "license": "MIT",
   "support": {
     "issues": "https://github.com/larvatech/easysdk/issues",
     "source": "https://github.com/larvatech/easysdk"
   },
-  "minimum-stability": "dev",
+  "prefer-stable": true,
   "authors": [
     {
       "name": "overtrue",
@@ -49,6 +50,11 @@
     "files": [
       "src/Helpers.php"
     ]
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0-dev"
+    }
   },
   "scripts": {
     "check-style": "vendor/bin/php-cs-fixer fix --using-cache=no --diff --config=.php-cs-fixer.php --dry-run --ansi",
