@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Larva\EasySDK;
 
+use Larva\EasySDK\Providers\ConfigServiceProvider;
+use Larva\EasySDK\Providers\EventDispatcherServiceProvider;
+use Larva\EasySDK\Providers\HttpClientServiceProvider;
+use Larva\EasySDK\Providers\LogServiceProvider;
 use Pimple\Container;
 
 class ServiceContainer extends Container
