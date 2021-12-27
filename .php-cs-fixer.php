@@ -1,9 +1,21 @@
 <?php
+$header = <<<'EOF'
+This file is part of the EasySDK package.
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+EOF;
 return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@PSR2' => true,
         '@DoctrineAnnotation' => true,
+        'header_comment' => [
+            'comment_type' => 'PHPDoc',
+            'header' => $header,
+            'separate' => 'none',
+            'location' => 'after_declare_strict',
+        ],
         'binary_operator_spaces' => true,
         'blank_line_before_statement' => [
             'statements' => [
@@ -60,7 +72,7 @@ return (new PhpCsFixer\Config())
         'standardize_not_equals' => true,
         'multiline_comment_opening_closing' => true,
         'ternary_to_null_coalescing' => true,
-        //'declare_strict_types' => true,//激进，强制打开严格模式
+        'declare_strict_types' => true,//激进，强制打开严格模式
     ])->setFinder(
         PhpCsFixer\Finder::create()
             ->exclude('bootstrap')

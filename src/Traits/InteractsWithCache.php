@@ -1,7 +1,12 @@
 <?php
 
 declare(strict_types=1);
-
+/**
+ * This file is part of the EasySDK package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Larva\EasySDK\Traits;
 
 use Larva\EasySDK\Exceptions\InvalidArgumentException;
@@ -28,7 +33,6 @@ trait InteractsWithCache
      * Get cache instance.
      *
      * @return SimpleCacheInterface
-     *
      * @throws InvalidArgumentException
      */
     public function getCache()
@@ -39,10 +43,8 @@ trait InteractsWithCache
 
         if (property_exists($this, 'app') && $this->app instanceof ServiceContainer && isset($this->app['cache'])) {
             $this->setCache($this->app['cache']);
-
             // Fix PHPStan error
             assert($this->cache instanceof SimpleCacheInterface);
-
             return $this->cache;
         }
 
@@ -53,9 +55,7 @@ trait InteractsWithCache
      * Set cache instance.
      *
      * @param SimpleCacheInterface|CacheItemPoolInterface $cache
-     *
      * @return $this
-     *
      * @throws InvalidArgumentException
      */
     public function setCache($cache)
@@ -82,9 +82,8 @@ trait InteractsWithCache
     protected function createDefaultCache()
     {
         if ($this->isSymfony43OrHigher()) {
-            return new Psr16Cache(new FilesystemAdapter('easywechat', 1500));
+            return new Psr16Cache(new FilesystemAdapter('easysdk', 1500));
         }
-
         return new FilesystemCache();
     }
 

@@ -1,7 +1,12 @@
 <?php
 
 declare(strict_types=1);
-
+/**
+ * This file is part of the EasySDK package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Larva\EasySDK;
 
 use GuzzleHttp\Exception\GuzzleException;
@@ -210,7 +215,7 @@ abstract class AccessToken implements AccessTokenInterface
     /**
      * @return string
      */
-    protected function getCacheKey()
+    protected function getCacheKey(): string
     {
         return $this->cachePrefix . md5(json_encode($this->getCredentials()));
     }
@@ -248,7 +253,7 @@ abstract class AccessToken implements AccessTokenInterface
     /**
      * @return string
      */
-    public function getTokenKey()
+    public function getTokenKey(): string
     {
         return $this->tokenKey;
     }
