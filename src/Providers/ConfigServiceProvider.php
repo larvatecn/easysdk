@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Larva\EasySDK\Providers;
 
-use Larva\EasySDK\Support\Config;
+use Larva\EasySDK\Config;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
