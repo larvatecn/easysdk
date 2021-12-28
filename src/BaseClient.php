@@ -170,6 +170,23 @@ class BaseClient
     }
 
     /**
+     * Put JSON request.
+     *
+     * @param string $url
+     * @param array $data
+     * @param array $query
+     *
+     * @return ResponseInterface|Collection|array|object|string
+     *
+     * @throws InvalidConfigException
+     * @throws GuzzleException
+     */
+    public function httpPutJson(string $url, array $data = [], array $query = [])
+    {
+        return $this->request($url, 'PUT', ['query' => $query, 'json' => $data]);
+    }
+
+    /**
      * Upload file.
      *
      * @param string $url
