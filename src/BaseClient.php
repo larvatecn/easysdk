@@ -259,7 +259,7 @@ class BaseClient
      * @throws InvalidConfigException
      * @throws GuzzleException
      */
-    public function request(string $url, string $method = 'GET', array $options = [], $returnRaw = false)
+    public function request(string $url, string $method = 'GET', array $options = [], bool $returnRaw = false)
     {
         if (empty($this->middlewares)) {
             $this->registerHttpMiddlewares();
