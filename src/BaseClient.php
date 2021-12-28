@@ -7,6 +7,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Larva\EasySDK;
 
 use GuzzleHttp\Exception\GuzzleException;
@@ -76,6 +77,20 @@ class BaseClient
     }
 
     /**
+     * Head request.
+     *
+     * @param string $url
+     * @param array $query
+     * @return array|Collection|object|ResponseInterface|string
+     * @throws GuzzleException
+     * @throws InvalidConfigException
+     */
+    public function httpHead(string $url, array $query = [])
+    {
+        return $this->request($url, 'HEAD', ['query' => $query]);
+    }
+
+    /**
      * POST request.
      *
      * @param string $url
@@ -89,6 +104,52 @@ class BaseClient
     public function httpPost(string $url, array $data = [])
     {
         return $this->request($url, 'POST', ['form_params' => $data]);
+    }
+
+    /**
+     * PUT request.
+     *
+     * @param string $url
+     * @param array $data
+     *
+     * @return ResponseInterface|Collection|array|object|string
+     *
+     * @throws InvalidConfigException
+     * @throws GuzzleException
+     */
+    public function httpPut(string $url, array $data = [])
+    {
+        return $this->request($url, 'PUT', ['form_params' => $data]);
+    }
+
+    /**
+     * PATCH request.
+     *
+     * @param string $url
+     * @param array $data
+     *
+     * @return ResponseInterface|Collection|array|object|string
+     *
+     * @throws InvalidConfigException
+     * @throws GuzzleException
+     */
+    public function httpPatch(string $url, array $data = [])
+    {
+        return $this->request($url, 'PATCH', ['form_params' => $data]);
+    }
+
+    /**
+     * Delete request.
+     *
+     * @param string $url
+     * @param array $data
+     * @return array|Collection|object|ResponseInterface|string
+     * @throws GuzzleException
+     * @throws InvalidConfigException
+     */
+    public function httpDelete(string $url, array $data = [])
+    {
+        return $this->request($url, 'DELETE', ['form_params' => $data]);
     }
 
     /**
