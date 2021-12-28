@@ -27,7 +27,6 @@ class EventDispatcherServiceProvider implements ServiceProviderInterface
     {
         !isset($pimple['events']) && $pimple['events'] = function ($app) {
             $dispatcher = new EventDispatcher();
-
             foreach ($app->config->get('events.listen', []) as $event => $listeners) {
                 foreach ($listeners as $listener) {
                     $dispatcher->addListener($event, $listener);

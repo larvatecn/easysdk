@@ -38,7 +38,7 @@ class Response extends GuzzleResponse
      *
      * @return Response
      */
-    public static function buildFromPsrResponse(ResponseInterface $response)
+    public static function buildFromPsrResponse(ResponseInterface $response): Response
     {
         return new static(
             $response->getStatusCode(),
@@ -54,7 +54,7 @@ class Response extends GuzzleResponse
      *
      * @return string
      */
-    public function toJson()
+    public function toJson(): string
     {
         return json_encode($this->toArray());
     }
@@ -64,7 +64,7 @@ class Response extends GuzzleResponse
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $content = $this->removeControlCharacters($this->getBodyContents());
 
@@ -86,7 +86,7 @@ class Response extends GuzzleResponse
      *
      * @return Collection
      */
-    public function toCollection()
+    public function toCollection(): Collection
     {
         return new Collection($this->toArray());
     }
@@ -108,11 +108,71 @@ class Response extends GuzzleResponse
     }
 
     /**
+     * Determine if the request was successful.
+     *
+     * @return bool
+     */
+    public function successful(): bool
+    {
+        return $this->getStatusCode() >= 200 && $this->getStatusCode() < 300;
+    }
+
+    /**
+     * Determine if the response code was "OK".
+     *
+     * @return bool
+     */
+    public function ok(): bool
+    {
+        return $this->getStatusCode() === 200;
+    }
+
+    /**
+     * Determine if the response was a redirect.
+     *
+     * @return bool
+     */
+    public function redirect(): bool
+    {
+        return $this->getStatusCode() >= 300 && $this->getStatusCode() < 400;
+    }
+
+    /**
+     * Determine if the response indicates a client or server error occurred.
+     *
+     * @return bool
+     */
+    public function failed(): bool
+    {
+        return $this->serverError() || $this->clientError();
+    }
+
+    /**
+     * Determine if the response indicates a client error occurred.
+     *
+     * @return bool
+     */
+    public function clientError(): bool
+    {
+        return $this->getStatusCode() >= 400 && $this->getStatusCode() < 500;
+    }
+
+    /**
+     * Determine if the response indicates a server error occurred.
+     *
+     * @return bool
+     */
+    public function serverError(): bool
+    {
+        return $this->getStatusCode() >= 500;
+    }
+
+    /**
      * @param string $content
      *
      * @return string
      */
-    protected function removeControlCharacters(string $content)
+    protected function removeControlCharacters(string $content): string
     {
         return \preg_replace('/[\x00-\x1F\x80-\x9F]/u', '', $content);
     }

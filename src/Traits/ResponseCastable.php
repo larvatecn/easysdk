@@ -35,7 +35,6 @@ trait ResponseCastable
     {
         $response = Response::buildFromPsrResponse($response);
         $response->getBody()->rewind();
-
         switch ($type ?? 'array') {
             case 'collection':
                 return $response->toCollection();
@@ -68,19 +67,15 @@ trait ResponseCastable
         switch (true) {
             case $response instanceof ResponseInterface:
                 $response = Response::buildFromPsrResponse($response);
-
                 break;
             case $response instanceof Arrayable:
                 $response = new Response(200, [], json_encode($response->toArray()));
-
                 break;
             case ($response instanceof Collection) || is_array($response) || is_object($response):
                 $response = new Response(200, [], json_encode($response));
-
                 break;
             case is_scalar($response):
                 $response = new Response(200, [], (string)$response);
-
                 break;
             default:
                 throw new InvalidArgumentException(sprintf('Unsupported response type "%s"', gettype($response)));

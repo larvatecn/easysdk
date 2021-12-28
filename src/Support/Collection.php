@@ -24,7 +24,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *
      * @var array
      */
-    protected $items = [];
+    protected array $items = [];
 
     /**
      * set data.

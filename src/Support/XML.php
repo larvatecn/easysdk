@@ -7,6 +7,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Larva\EasySDK\Support;
 
 use SimpleXMLElement;
@@ -45,23 +46,15 @@ class XML
      *
      * @return string
      */
-    public static function build(
-        $data,
-        $root = 'xml',
-        $item = 'item',
-        $attr = '',
-        $id = 'id'
-    ) {
+    public static function build($data, $root = 'xml', $item = 'item', $attr = '', $id = 'id')
+    {
         if (is_array($attr)) {
             $_attr = [];
-
             foreach ($attr as $key => $value) {
                 $_attr[] = "{$key}=\"{$value}\"";
             }
-
             $attr = implode(' ', $_attr);
         }
-
         $attr = trim($attr);
         $attr = empty($attr) ? '' : " {$attr}";
         $xml = "<{$root}{$attr}>";
@@ -96,7 +89,7 @@ class XML
         $result = null;
 
         if (is_object($obj)) {
-            $obj = (array) $obj;
+            $obj = (array)$obj;
         }
 
         if (is_array($obj)) {
@@ -137,7 +130,7 @@ class XML
             $xml .= "<{$key}{$attr}>";
 
             if ((is_array($val) || is_object($val))) {
-                $xml .= self::data2Xml((array) $val, $item, $id);
+                $xml .= self::data2Xml((array)$val, $item, $id);
             } else {
                 $xml .= is_numeric($val) ? $val : self::cdata($val);
             }

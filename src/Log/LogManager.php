@@ -180,10 +180,10 @@ class LogManager implements LoggerInterface
      *
      * @throws Exception
      */
-    protected function createEmergencyLogger()
+    protected function createEmergencyLogger(): Monolog
     {
         return new Monolog('EasySDK', $this->prepareHandlers([new StreamHandler(
-            \sys_get_temp_dir() . '/open-sdk.log',
+            \sys_get_temp_dir() . '/easysdk.log',
             $this->level(['level' => 'debug'])
         )]));
     }

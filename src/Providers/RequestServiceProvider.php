@@ -9,16 +9,16 @@ declare(strict_types=1);
  */
 namespace Larva\EasySDK\Providers;
 
-use Larva\EasySDK\Log\LogManager;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class LoggingServiceProvider.
+ * Class RequestServiceProvider.
  *
  * @author overtrue <i@overtrue.me>
  */
-class LogServiceProvider implements ServiceProviderInterface
+class RequestServiceProvider implements ServiceProviderInterface
 {
     /**
      * Registers services on the given container.
@@ -30,13 +30,8 @@ class LogServiceProvider implements ServiceProviderInterface
      */
     public function register(Container $pimple)
     {
-        !isset($pimple['log']) && $pimple['log'] = function ($app) {
-            $config = $app['config']->get('log');
-            if (!empty($config)) {
-                $app->rebind('config', $app['config']->merge($config));
-            }
-            return new LogManager($app);
+        !isset($pimple['request']) && $pimple['request'] = function () {
+            return Request::createFromGlobals();
         };
-        !isset($pimple['logger']) && $pimple['logger'] = $pimple['log'];
     }
 }

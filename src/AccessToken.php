@@ -229,7 +229,7 @@ abstract class AccessToken implements AccessTokenInterface
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws InvalidConfigException
      * @throws InvalidArgumentException
-     * @throws RuntimeException
+     * @throws RuntimeException|GuzzleException
      */
     protected function getQuery(): array
     {

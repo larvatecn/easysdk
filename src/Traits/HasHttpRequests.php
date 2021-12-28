@@ -7,6 +7,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Larva\EasySDK\Traits;
 
 use GuzzleHttp\Client;
@@ -113,9 +114,8 @@ trait HasHttpRequests
         if (!is_null($name)) {
             $this->middlewares[$name] = $middleware;
         } else {
-            array_push($this->middlewares, $middleware);
+            $this->middlewares[] = $middleware;
         }
-
         return $this;
     }
 
@@ -140,21 +140,16 @@ trait HasHttpRequests
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function request($url, $method = 'GET', $options = []): ResponseInterface
+    public function request(string $url, string $method = 'GET', array $options = []): ResponseInterface
     {
         $method = strtoupper($method);
-
         $options = array_merge(self::$defaults, $options, ['handler' => $this->getHandlerStack()]);
-
         $options = $this->fixJsonIssue($options);
-
         if (property_exists($this, 'baseUri') && !is_null($this->baseUri)) {
             $options['base_uri'] = $this->baseUri;
         }
-
         $response = $this->getHttpClient()->request($method, $url, $options);
         $response->getBody()->rewind();
-
         return $response;
     }
 
@@ -166,7 +161,6 @@ trait HasHttpRequests
     public function setHandlerStack(HandlerStack $handlerStack)
     {
         $this->handlerStack = $handlerStack;
-
         return $this;
     }
 
@@ -180,13 +174,10 @@ trait HasHttpRequests
         if ($this->handlerStack) {
             return $this->handlerStack;
         }
-
         $this->handlerStack = HandlerStack::create($this->getGuzzleHandler());
-
         foreach ($this->middlewares as $name => $middleware) {
             $this->handlerStack->push($middleware, $name);
         }
-
         return $this->handlerStack;
     }
 
@@ -199,16 +190,13 @@ trait HasHttpRequests
     {
         if (isset($options['json']) && is_array($options['json'])) {
             $options['headers'] = array_merge($options['headers'] ?? [], ['Content-Type' => 'application/json']);
-
             if (empty($options['json'])) {
                 $options['body'] = Utils::jsonEncode($options['json'], JSON_FORCE_OBJECT);
             } else {
                 $options['body'] = Utils::jsonEncode($options['json'], JSON_UNESCAPED_UNICODE);
             }
-
             unset($options['json']);
         }
-
         return $options;
     }
 
@@ -220,11 +208,8 @@ trait HasHttpRequests
     protected function getGuzzleHandler()
     {
         if (property_exists($this, 'app') && isset($this->app['guzzle_handler'])) {
-            return is_string($handler = $this->app->raw('guzzle_handler'))
-                ? new $handler()
-                : $handler;
+            return is_string($handler = $this->app->raw('guzzle_handler')) ? new $handler() : $handler;
         }
-
         return Utils::chooseHandler();
     }
 }

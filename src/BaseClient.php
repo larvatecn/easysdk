@@ -167,7 +167,6 @@ class BaseClient
     public function setAccessToken(AccessTokenInterface $accessToken)
     {
         $this->accessToken = $accessToken;
-
         return $this;
     }
 
@@ -187,11 +186,8 @@ class BaseClient
         if (empty($this->middlewares)) {
             $this->registerHttpMiddlewares();
         }
-
         $response = $this->performRequest($url, $method, $options);
-
         $this->app->events->dispatch(new Events\HttpResponseCreated($response));
-
         return $returnRaw ? $response : $this->castResponseToType($response, $this->app->config->get('response_type'));
     }
 
