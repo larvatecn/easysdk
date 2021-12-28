@@ -10,3 +10,17 @@
 composer require larva/easysdk -vv
 ```
 
+## Usage
+
+```php
+$options = [
+
+    'log' => [
+        'level' => 'debug',
+        'file'  => '/tmp/easysdk.log',
+    ],
+    // ...
+];
+$app = new \Larva\EasySDK\ServiceContainer($options);
+// 一般是 继承 \Larva\EasySDK\ServiceContainer 类来扩展出API
+```
