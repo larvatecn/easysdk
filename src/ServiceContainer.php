@@ -115,6 +115,29 @@ class ServiceContainer extends Container
     }
 
     /**
+     * Get access.
+     *
+     * @param string $id
+     *
+     * @return mixed
+     */
+    public function get($id)
+    {
+        return $this->offsetGet($id);
+    }
+
+    /**
+     * Set access.
+     *
+     * @param string $id
+     * @param mixed $value
+     */
+    public function set($id, $value)
+    {
+        $this->offsetSet($id, $value);
+    }
+
+    /**
      * Magic get access.
      *
      * @param string $id
