@@ -43,7 +43,7 @@ trait HasHttpRequests
      *
      * @var string
      */
-    protected $bodyFormat = 'form_params';
+    protected $bodyFormat;
 
     /**
      * The raw body for the request.
@@ -57,7 +57,7 @@ trait HasHttpRequests
      *
      * @var array
      */
-    protected $pendingFiles = [];
+    protected array $pendingFiles = [];
 
     /**
      * The request cookies.
@@ -78,14 +78,14 @@ trait HasHttpRequests
      *
      * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * The middleware callables added by users that will handle requests.
      *
      * @var array
      */
-    protected $middlewares = [];
+    protected array $middlewares = [];
 
     /**
      * @var HandlerStack
@@ -95,7 +95,7 @@ trait HasHttpRequests
     /**
      * @var array
      */
-    protected static $defaultOptions = [
+    protected static array $defaultOptions = [
         'http_errors' => false,
     ];
 
@@ -165,6 +165,16 @@ trait HasHttpRequests
     }
 
     /**
+     * 设置该请求是一个 Multipart 表单
+     *
+     * @return $this
+     */
+    public function asMultipart()
+    {
+        return $this->bodyFormat('multipart');
+    }
+
+    /**
      * 添加文件到请求
      *
      * @param string|array $name
@@ -193,16 +203,6 @@ trait HasHttpRequests
         ]);
 
         return $this;
-    }
-
-    /**
-     * 设置该请求是一个 Multipart 表单
-     *
-     * @return $this
-     */
-    public function asMultipart()
-    {
-        return $this->bodyFormat('multipart');
     }
 
     /**

@@ -56,7 +56,6 @@ class BaseClient
         $this->accessToken = $accessToken ?? $this->app['access_token'];
         $this->withUserAgent('GuzzleHttp/7 EasySDK/1.0');
         $this->asJson();
-        $this->acceptJson();
     }
 
     /**
