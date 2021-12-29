@@ -81,6 +81,7 @@ class ServiceContainer extends Container
         $base = [
             // http://docs.guzzlephp.org/en/stable/request-options.html
             'http' => [
+                'http_errors' => false,
                 'timeout' => 30.0,
                 'base_uri' => $this->userConfig['base_uri'],
             ],

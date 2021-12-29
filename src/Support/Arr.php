@@ -7,6 +7,7 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Larva\EasySDK\Support;
 
 /**
@@ -39,7 +40,7 @@ class Arr
      *
      * @return array
      */
-    public static function crossJoin(...$arrays)
+    public static function crossJoin(...$arrays): array
     {
         $results = [[]];
 
@@ -67,7 +68,7 @@ class Arr
      *
      * @return array
      */
-    public static function divide(array $array)
+    public static function divide(array $array): array
     {
         return [array_keys($array), array_values($array)];
     }
@@ -80,15 +81,15 @@ class Arr
      *
      * @return array
      */
-    public static function dot(array $array, $prepend = '')
+    public static function dot(array $array, string $prepend = ''): array
     {
         $results = [];
 
         foreach ($array as $key => $value) {
             if (is_array($value) && !empty($value)) {
-                $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
+                $results = array_merge($results, static::dot($value, $prepend . $key . '.'));
             } else {
-                $results[$prepend.$key] = $value;
+                $results[$prepend . $key] = $value;
             }
         }
 
@@ -103,7 +104,7 @@ class Arr
      *
      * @return array
      */
-    public static function except(array $array, $keys)
+    public static function except(array $array, $keys): array
     {
         static::forget($array, $keys);
 
@@ -118,7 +119,7 @@ class Arr
      *
      * @return bool
      */
-    public static function exists(array $array, $key)
+    public static function exists(array $array, $key): bool
     {
         return array_key_exists($key, $array);
     }
@@ -179,7 +180,7 @@ class Arr
      *
      * @return array
      */
-    public static function flatten(array $array, $depth = \PHP_INT_MAX)
+    public static function flatten(array $array, $depth = \PHP_INT_MAX): array
     {
         return array_reduce($array, function ($result, $item) use ($depth) {
             $item = $item instanceof Collection ? $item->all() : $item;
@@ -204,7 +205,7 @@ class Arr
     {
         $original = &$array;
 
-        $keys = (array) $keys;
+        $keys = (array)$keys;
 
         if (0 === count($keys)) {
             return;
@@ -281,7 +282,7 @@ class Arr
             return false;
         }
 
-        $keys = (array) $keys;
+        $keys = (array)$keys;
 
         if (empty($array)) {
             return false;
@@ -336,7 +337,7 @@ class Arr
      */
     public static function only(array $array, $keys)
     {
-        return array_intersect_key($array, array_flip((array) $keys));
+        return array_intersect_key($array, array_flip((array)$keys));
     }
 
     /**
@@ -397,7 +398,7 @@ class Arr
 
         $results = [];
 
-        foreach ((array) $keys as $key) {
+        foreach ((array)$keys as $key) {
             $results[] = $array[$key];
         }
 

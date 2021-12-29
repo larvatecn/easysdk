@@ -96,7 +96,6 @@ trait HasHttpRequests
      * @var array
      */
     protected static array $defaultOptions = [
-        'http_errors' => false,
     ];
 
     /**
@@ -183,7 +182,7 @@ trait HasHttpRequests
      * @param array $headers
      * @return $this
      */
-    public function attach($name, $contents = '', $filename = null, array $headers = [])
+    public function attach($name, $contents = '', string $filename = null, array $headers = [])
     {
         if (is_array($name)) {
             foreach ($name as $file) {
@@ -192,16 +191,13 @@ trait HasHttpRequests
 
             return $this;
         }
-
         $this->asMultipart();
-
         $this->pendingFiles[] = array_filter([
             'name' => $name,
             'contents' => $contents,
             'headers' => $headers,
             'filename' => $filename,
         ]);
-
         return $this;
     }
 
@@ -466,8 +462,7 @@ trait HasHttpRequests
      * @param string $method
      * @param array $options
      * @return Response
-     * @throws ConnectionException
-     * @throws GuzzleException
+     * @throws ConnectionException|GuzzleException
      */
     public function request(string $url, string $method, array $options = []): Response
     {
@@ -533,7 +528,6 @@ trait HasHttpRequests
     public function setHttpClient(ClientInterface $httpClient)
     {
         $this->httpClient = $httpClient;
-
         return $this;
     }
 
@@ -588,9 +582,7 @@ trait HasHttpRequests
         if ($this->handlerStack) {
             return $this->handlerStack;
         }
-
         $this->handlerStack = HandlerStack::create($this->getGuzzleHandler());
-
         $this->handlerStack->push(function (callable $handler) {
             return function (RequestInterface $request, array $options) use ($handler) {
                 $this->cookies = $options['cookies'];
@@ -600,7 +592,6 @@ trait HasHttpRequests
         foreach ($this->middlewares as $name => $middleware) {
             $this->handlerStack->push($middleware, $name);
         }
-
         return $this->handlerStack;
     }
 

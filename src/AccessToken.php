@@ -7,20 +7,19 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Larva\EasySDK;
 
 use GuzzleHttp\Exception\GuzzleException;
+use Larva\EasySDK\Exceptions\ConnectionException;
 use Larva\EasySDK\Exceptions\HttpException;
 use Larva\EasySDK\Contracts\AccessTokenInterface;
 use Larva\EasySDK\Exceptions\InvalidArgumentException;
-use Larva\EasySDK\Exceptions\InvalidConfigException;
 use Larva\EasySDK\Exceptions\RuntimeException;
 use Larva\EasySDK\Http\Response;
-use Larva\EasySDK\Support\Collection;
 use Larva\EasySDK\Traits\HasHttpRequests;
 use Larva\EasySDK\Traits\InteractsWithCache;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 
 abstract class AccessToken implements AccessTokenInterface
 {
@@ -35,7 +34,7 @@ abstract class AccessToken implements AccessTokenInterface
     /**
      * @var string
      */
-    protected $requestMethod = 'GET';
+    protected string $requestMethod = 'GET';
 
     /**
      * @var string
@@ -55,12 +54,12 @@ abstract class AccessToken implements AccessTokenInterface
     /**
      * @var string
      */
-    protected $tokenKey = 'access_token';
+    protected string $tokenKey = 'access_token';
 
     /**
      * @var string
      */
-    protected $cachePrefix = 'easysdk.access_token.';
+    protected string $cachePrefix = 'easysdk.access_token.';
 
     /**
      * AccessToken constructor.
@@ -76,10 +75,6 @@ abstract class AccessToken implements AccessTokenInterface
      * @return array
      *
      * @throws HttpException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws RuntimeException|GuzzleException
      */
     public function getRefreshedToken(): array
     {
@@ -92,10 +87,6 @@ abstract class AccessToken implements AccessTokenInterface
      * @return array
      *
      * @throws HttpException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws RuntimeException|GuzzleException
      */
     public function getToken(bool $refresh = false): array
     {
@@ -117,14 +108,11 @@ abstract class AccessToken implements AccessTokenInterface
     }
 
     /**
+     * 设置访问令牌
      * @param string $token
      * @param int $lifetime
-     *
      * @return AccessTokenInterface
-     *
-     * @throws InvalidArgumentException
-     * @throws RuntimeException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException|RuntimeException
      */
     public function setToken(string $token, int $lifetime = 7200): AccessTokenInterface
     {
@@ -132,22 +120,16 @@ abstract class AccessToken implements AccessTokenInterface
             $this->tokenKey => $token,
             'expires_in' => $lifetime,
         ], $lifetime);
-
         if (!$this->getCache()->has($this->getCacheKey())) {
             throw new RuntimeException('Failed to cache access token.');
         }
-
         return $this;
     }
 
     /**
+     * 刷新令牌
      * @return AccessTokenInterface
-     *
      * @throws HttpException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws RuntimeException
      */
     public function refresh(): AccessTokenInterface
     {
@@ -156,14 +138,12 @@ abstract class AccessToken implements AccessTokenInterface
     }
 
     /**
+     * 请求访问令牌
      * @param array $credentials
-     * @return ResponseInterface|Collection|array|object|string
-     * @throws Exceptions\ConnectionException
-     * @throws GuzzleException
-     * @throws HttpException
-     * @throws InvalidArgumentException
+     * @return array
+     * @throws ConnectionException|HttpException|GuzzleException
      */
-    public function requestToken(array $credentials)
+    public function requestToken(array $credentials): array
     {
         $response = $this->sendRequest($credentials);
         if (empty($response->json($this->tokenKey))) {
@@ -180,7 +160,6 @@ abstract class AccessToken implements AccessTokenInterface
      *
      * @throws HttpException
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws InvalidConfigException
      * @throws InvalidArgumentException
      * @throws RuntimeException|GuzzleException
      */
@@ -195,11 +174,8 @@ abstract class AccessToken implements AccessTokenInterface
      * Send http request.
      *
      * @param array $credentials
-     *
      * @return Response
-     *
-     * @throws InvalidArgumentException
-     * @throws GuzzleException|Exceptions\ConnectionException
+     * @throws GuzzleException|ConnectionException
      */
     protected function sendRequest(array $credentials): Response
     {
@@ -221,12 +197,6 @@ abstract class AccessToken implements AccessTokenInterface
      * The request query will be used to add to the request.
      *
      * @return array
-     *
-     * @throws HttpException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException
-     * @throws RuntimeException|GuzzleException
      */
     protected function getQuery(): array
     {
@@ -234,9 +204,8 @@ abstract class AccessToken implements AccessTokenInterface
     }
 
     /**
+     * 获取令牌访问点
      * @return string
-     *
-     * @throws InvalidArgumentException
      */
     public function getEndpoint(): string
     {

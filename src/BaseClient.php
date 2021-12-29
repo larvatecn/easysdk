@@ -15,9 +15,7 @@ use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
 use Larva\EasySDK\Contracts\AccessTokenInterface;
 use Larva\EasySDK\Exceptions\ConnectionException;
-use Larva\EasySDK\Exceptions\InvalidConfigException;
 use Larva\EasySDK\Http\Response;
-use Larva\EasySDK\Support\Collection;
 use Larva\EasySDK\Traits\HasHttpRequests;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -68,7 +66,7 @@ class BaseClient
      * @throws ConnectionException
      * @throws GuzzleException
      */
-    public function get(string $url, $query = null)
+    public function get(string $url, $query = null): Response
     {
         return $this->request($url, 'GET', [
             'query' => $query,
@@ -79,12 +77,12 @@ class BaseClient
      * Issue a HEAD request to the given URL.
      *
      * @param string $url
-     * @param array|string|null $query
+     * @param mixed $query
      * @return Response
      * @throws ConnectionException
      * @throws GuzzleException
      */
-    public function head(string $url, $query = null)
+    public function head(string $url, $query = null): Response
     {
         return $this->request($url, 'HEAD', [
             'query' => $query,
@@ -95,12 +93,12 @@ class BaseClient
      * Issue a POST request to the given URL.
      *
      * @param string $url
-     * @param array $data
+     * @param mixed $data
      * @return Response
      * @throws ConnectionException
      * @throws GuzzleException
      */
-    public function post(string $url, array $data = [])
+    public function post(string $url, array $data = []): Response
     {
         return $this->request($url, 'POST', [
             $this->bodyFormat => $data,
@@ -111,12 +109,12 @@ class BaseClient
      * Issue a PATCH request to the given URL.
      *
      * @param string $url
-     * @param array $data
+     * @param mixed $data
      * @return Response
      * @throws ConnectionException
      * @throws GuzzleException
      */
-    public function patch(string $url, $data = [])
+    public function patch(string $url, $data = []): Response
     {
         return $this->request($url, 'PATCH', [
             $this->bodyFormat => $data,
@@ -127,12 +125,12 @@ class BaseClient
      * Issue a PUT request to the given URL.
      *
      * @param string $url
-     * @param array $data
+     * @param mixed $data
      * @return Response
      * @throws ConnectionException
      * @throws GuzzleException
      */
-    public function put(string $url, $data = [])
+    public function put(string $url, $data = []): Response
     {
         return $this->request($url, 'PUT', [
             $this->bodyFormat => $data,
@@ -143,12 +141,12 @@ class BaseClient
      * Issue a DELETE request to the given URL.
      *
      * @param string $url
-     * @param array $data
+     * @param mixed $data
      * @return Response
      * @throws ConnectionException
      * @throws GuzzleException
      */
-    public function delete(string $url, $data = [])
+    public function delete(string $url, $data = []): Response
     {
         return $this->request($url, 'DELETE', empty($data) ? [] : [
             $this->bodyFormat => $data,
@@ -181,7 +179,7 @@ class BaseClient
      * @return Response
      * @throws GuzzleException|ConnectionException
      */
-    public function request(string $url, string $method = 'GET', array $options = [])
+    public function request(string $url, string $method = 'GET', array $options = []): Response
     {
         if (empty($this->middlewares)) {
             $this->registerHttpMiddlewares();
@@ -216,7 +214,6 @@ class BaseClient
                 if ($this->accessToken) {
                     $request = $this->accessToken->applyToRequest($request, $options);
                 }
-
                 return $handler($request, $options);
             };
         };
@@ -230,7 +227,6 @@ class BaseClient
     protected function logMiddleware()
     {
         $formatter = new MessageFormatter($this->app['config']['http.log_template'] ?? MessageFormatter::DEBUG);
-
         return Middleware::log($this->app['logger'], $formatter, LogLevel::DEBUG);
     }
 

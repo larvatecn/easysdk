@@ -19,7 +19,7 @@ use Larva\EasySDK\Http\Response;
 class HttpResponseCreated
 {
     /**
-     * @var ResponseInterface
+     * @var Response
      */
     public $response;
 
