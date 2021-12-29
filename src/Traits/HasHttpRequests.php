@@ -96,7 +96,7 @@ trait HasHttpRequests
      * @var array
      */
     protected static $defaultOptions = [
-
+        'http_errors' => false,
     ];
 
     /**
