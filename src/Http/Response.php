@@ -9,102 +9,147 @@ declare(strict_types=1);
  */
 namespace Larva\EasySDK\Http;
 
-use GuzzleHttp\Psr7\Response as GuzzleResponse;
-use Larva\EasySDK\Support\Collection;
-use Larva\EasySDK\Support\XML;
+use ArrayAccess;
+use Larva\EasySDK\Exceptions\InvalidArgumentException;
+use Larva\EasySDK\Exceptions\RuntimeException;
+use Larva\EasySDK\Support\File;
+use LogicException;
+use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 
 /**
- * Class Response.
- *
- * @author overtrue <i@overtrue.me>
+ * 响应类
+ * @property $transferStats
+ * @property $cookies
+ * @author Tongle Xu <xutongle@msn.com>
  */
-class Response extends GuzzleResponse
+class Response implements ArrayAccess
 {
     /**
+     * The underlying PSR response.
+     *
+     * @var ResponseInterface
+     */
+    protected $response;
+
+    /**
+     * The decoded JSON response.
+     *
+     * @var array|null
+     */
+    protected ?array $decoded = null;
+
+    /**
+     * Create a new response instance.
+     *
+     * @param MessageInterface $response
+     * @return void
+     */
+    public function __construct(MessageInterface $response)
+    {
+        $this->response = $response;
+    }
+
+    /**
+     * Get the body of the response.
+     *
      * @return string
      */
-    public function getBodyContents()
+    public function body(): string
     {
-        $this->getBody()->rewind();
-        $contents = $this->getBody()->getContents();
-        $this->getBody()->rewind();
-
+        $this->response->getBody()->rewind();
+        $contents = $this->response->getBody()->getContents();
+        $this->response->getBody()->rewind();
         return $contents;
     }
 
     /**
-     * @param \Psr\Http\Message\ResponseInterface $response
+     * Get the JSON decoded body of the response as an array or scalar value.
      *
-     * @return Response
+     * @param string|null $key
+     * @param mixed $default
+     * @return mixed
      */
-    public static function buildFromPsrResponse(ResponseInterface $response): Response
+    public function json(string $key = null, $default = null)
     {
-        return new static(
-            $response->getStatusCode(),
-            $response->getHeaders(),
-            $response->getBody(),
-            $response->getProtocolVersion(),
-            $response->getReasonPhrase()
-        );
-    }
-
-    /**
-     * Build to json.
-     *
-     * @return string
-     */
-    public function toJson(): string
-    {
-        return json_encode($this->toArray());
-    }
-
-    /**
-     * Build to array.
-     *
-     * @return array
-     */
-    public function toArray(): array
-    {
-        $content = $this->removeControlCharacters($this->getBodyContents());
-
-        if (false !== stripos($this->getHeaderLine('Content-Type'), 'xml') || 0 === stripos($content, '<xml')) {
-            return XML::parse($content);
+        if (!$this->decoded) {
+            $this->decoded = json_decode($this->body(), true);
         }
-
-        $array = json_decode($content, true, 512, JSON_BIGINT_AS_STRING);
-
-        if (JSON_ERROR_NONE === json_last_error()) {
-            return (array) $array;
+        if (is_null($key)) {
+            return $this->decoded;
         }
-
-        return [];
+        return $this->decoded[$key] ?? $default;
     }
 
     /**
-     * Get collection data.
+     * Get the XML decoded body of the response as an array or scalar value.
      *
-     * @return Collection
+     * @param string|null $key
+     * @param mixed $default
+     * @return mixed
      */
-    public function toCollection(): Collection
+    public function xml(string $key = null, $default = null)
     {
-        return new Collection($this->toArray());
+        if (!$this->decoded) {
+            $dom = new \DOMDocument('1.0', 'UTF-8');
+            $dom->loadXML($this->body(), LIBXML_NOCDATA);
+            $this->decoded = $this->convertXmlToArray(simplexml_import_dom($dom->documentElement));
+        }
+        if (is_null($key)) {
+            return $this->decoded;
+        }
+        return $this->decoded[$key] ?? $default;
     }
 
     /**
+     * Get the JSON decoded body of the response as an object.
+     *
      * @return object
      */
-    public function toObject()
+    public function object()
     {
-        return json_decode($this->toJson());
+        return json_decode($this->body(), false);
     }
 
     /**
-     * @return bool|string
+     * Get a header from the response.
+     *
+     * @param string $header
+     * @return string
      */
-    public function __toString()
+    public function header(string $header): string
     {
-        return $this->getBodyContents();
+        return $this->response->getHeaderLine($header);
+    }
+
+    /**
+     * Retrieves all message header values.
+     * @return array
+     */
+    public function getHeaders(): array
+    {
+        return $this->response->getHeaders();
+    }
+
+    /**
+     * Get the status code of the response.
+     *
+     * @return int
+     */
+    public function statusCode(): int
+    {
+        return (int)$this->response->getStatusCode();
+    }
+
+    /**
+     * Get the effective URI of the response.
+     *
+     * @return UriInterface
+     */
+    public function effectiveUri(): UriInterface
+    {
+        return $this->transferStats->getEffectiveUri();
     }
 
     /**
@@ -114,7 +159,7 @@ class Response extends GuzzleResponse
      */
     public function successful(): bool
     {
-        return $this->getStatusCode() >= 200 && $this->getStatusCode() < 300;
+        return $this->statusCode() >= 200 && $this->statusCode() < 300;
     }
 
     /**
@@ -124,7 +169,7 @@ class Response extends GuzzleResponse
      */
     public function ok(): bool
     {
-        return $this->getStatusCode() === 200;
+        return $this->statusCode() === 200;
     }
 
     /**
@@ -134,7 +179,7 @@ class Response extends GuzzleResponse
      */
     public function redirect(): bool
     {
-        return $this->getStatusCode() >= 300 && $this->getStatusCode() < 400;
+        return $this->statusCode() >= 300 && $this->statusCode() < 400;
     }
 
     /**
@@ -154,7 +199,7 @@ class Response extends GuzzleResponse
      */
     public function clientError(): bool
     {
-        return $this->getStatusCode() >= 400 && $this->getStatusCode() < 500;
+        return $this->statusCode() >= 400 && $this->statusCode() < 500;
     }
 
     /**
@@ -164,16 +209,165 @@ class Response extends GuzzleResponse
      */
     public function serverError(): bool
     {
-        return $this->getStatusCode() >= 500;
+        return $this->statusCode() >= 500;
     }
 
     /**
-     * @param string $content
+     * Get the underlying PSR response for the response.
+     *
+     * @return ResponseInterface
+     */
+    public function toPsrResponse()
+    {
+        return $this->response;
+    }
+
+    /**
+     * Determine if the given offset exists.
+     *
+     * @param string $offset
+     * @return bool
+     */
+    public function offsetExists($offset)
+    {
+        return isset($this->json()[$offset]);
+    }
+
+    /**
+     * Get the value for a given offset.
+     *
+     * @param string $offset
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        return $this->json()[$offset];
+    }
+
+    /**
+     * Set the value at the given offset.
+     *
+     * @param string $offset
+     * @param mixed $value
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function offsetSet($offset, $value)
+    {
+        throw new LogicException('Response data may not be mutated using array access.');
+    }
+
+    /**
+     * Unset the value at the given offset.
+     *
+     * @param string $offset
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    public function offsetUnset($offset)
+    {
+        throw new LogicException('Response data may not be mutated using array access.');
+    }
+
+    /**
+     * @param string $directory
+     * @param string $filename
+     * @param bool $appendSuffix
+     *
+     * @return bool|int
+     *
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     */
+    public function save(string $directory, string $filename = '', bool $appendSuffix = true)
+    {
+        $this->response->getBody()->rewind();
+        $directory = rtrim($directory, '/');
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true); // @codeCoverageIgnore
+        }
+
+        if (!is_writable($directory)) {
+            throw new InvalidArgumentException(sprintf("'%s' is not writable.", $directory));
+        }
+
+        $contents = $this->getBody()->getContents();
+
+        if (empty($contents) || '{' === $contents[0]) {
+            throw new RuntimeException('Invalid media response content.');
+        }
+
+        if (empty($filename)) {
+            if (preg_match('/filename="(?<filename>.*?)"/', $this->getHeaderLine('Content-Disposition'), $match)) {
+                $filename = $match['filename'];
+            } else {
+                $filename = md5($contents);
+            }
+        }
+
+        if ($appendSuffix && empty(pathinfo($filename, PATHINFO_EXTENSION))) {
+            $filename .= File::getStreamExt($contents);
+        }
+
+        file_put_contents($directory.'/'.$filename, $contents);
+
+        return $filename;
+    }
+
+    /**
+     * @param string $directory
+     * @param string $filename
+     * @param bool $appendSuffix
+     *
+     * @return bool|int
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     */
+    public function saveAs(string $directory, string $filename, bool $appendSuffix = true)
+    {
+        return $this->save($directory, $filename, $appendSuffix);
+    }
+
+    /**
+     * Get the body of the response.
      *
      * @return string
      */
-    protected function removeControlCharacters(string $content): string
+    public function __toString()
     {
-        return \preg_replace('/[\x00-\x1F\x80-\x9F]/u', '', $content);
+        return $this->body();
+    }
+
+    /**
+     * Dynamically proxy other methods to the underlying response.
+     *
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->response->{$method}(...$parameters);
+    }
+
+    /**
+     * Converts XML document to array.
+     * @param string|\SimpleXMLElement $xml xml to process.
+     * @return array XML array representation.
+     */
+    protected function convertXmlToArray($xml): array
+    {
+        if (is_string($xml)) {
+            $xml = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+        }
+        $result = (array)$xml;
+        foreach ($result as $key => $value) {
+            if (!is_scalar($value)) {
+                $result[$key] = $this->convertXmlToArray($value);
+            }
+        }
+        return $result;
     }
 }

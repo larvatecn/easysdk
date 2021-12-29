@@ -15,6 +15,7 @@ use Larva\EasySDK\Contracts\AccessTokenInterface;
 use Larva\EasySDK\Exceptions\InvalidArgumentException;
 use Larva\EasySDK\Exceptions\InvalidConfigException;
 use Larva\EasySDK\Exceptions\RuntimeException;
+use Larva\EasySDK\Http\Response;
 use Larva\EasySDK\Support\Collection;
 use Larva\EasySDK\Traits\HasHttpRequests;
 use Larva\EasySDK\Traits\InteractsWithCache;
@@ -156,21 +157,19 @@ abstract class AccessToken implements AccessTokenInterface
 
     /**
      * @param array $credentials
-     * @param bool $toArray
      * @return ResponseInterface|Collection|array|object|string
+     * @throws Exceptions\ConnectionException
+     * @throws GuzzleException
      * @throws HttpException
-     * @throws InvalidConfigException
-     * @throws InvalidArgumentException|GuzzleException
+     * @throws InvalidArgumentException
      */
-    public function requestToken(array $credentials, bool $toArray = false)
+    public function requestToken(array $credentials)
     {
         $response = $this->sendRequest($credentials);
-        $result = json_decode($response->getBody()->getContents(), true);
-        $formatted = $this->castResponseToType($response, $this->app['config']->get('response_type'));
         if (empty($result[$this->tokenKey])) {
-            throw new HttpException('Request access_token fail: ' . json_encode($result, JSON_UNESCAPED_UNICODE), $response, $formatted);
+            throw new HttpException('Request access_token fail: ' . json_encode($response->json(), JSON_UNESCAPED_UNICODE), $response->toPsrResponse());
         }
-        return $toArray ? $result : $formatted;
+        return $response->json();
     }
 
     /**
@@ -183,7 +182,7 @@ abstract class AccessToken implements AccessTokenInterface
      * @throws \Psr\SimpleCache\InvalidArgumentException
      * @throws InvalidConfigException
      * @throws InvalidArgumentException
-     * @throws RuntimeException
+     * @throws RuntimeException|GuzzleException
      */
     public function applyToRequest(RequestInterface $request, array $requestOptions = []): RequestInterface
     {
@@ -197,12 +196,12 @@ abstract class AccessToken implements AccessTokenInterface
      *
      * @param array $credentials
      *
-     * @return ResponseInterface
+     * @return Response
      *
      * @throws InvalidArgumentException
-     * @throws GuzzleException
+     * @throws GuzzleException|Exceptions\ConnectionException
      */
-    protected function sendRequest(array $credentials): ResponseInterface
+    protected function sendRequest(array $credentials): Response
     {
         $options = [
             ('GET' === $this->requestMethod) ? 'query' : 'json' => $credentials,

@@ -14,6 +14,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
 use Larva\EasySDK\Contracts\AccessTokenInterface;
+use Larva\EasySDK\Exceptions\ConnectionException;
 use Larva\EasySDK\Exceptions\InvalidConfigException;
 use Larva\EasySDK\Http\Response;
 use Larva\EasySDK\Support\Collection;
@@ -44,11 +45,6 @@ class BaseClient
     protected $accessToken = null;
 
     /**
-     * @var string
-     */
-    protected $baseUri;
-
-    /**
      * BaseClient constructor.
      *
      * @param ServiceContainer $app
@@ -58,175 +54,103 @@ class BaseClient
     {
         $this->app = $app;
         $this->accessToken = $accessToken ?? $this->app['access_token'];
+        $this->withUserAgent('GuzzleHttp/7 EasySDK/1.0');
     }
 
     /**
-     * GET request.
+     * Issue a GET request to the given URL.
      *
      * @param string $url
-     * @param array $query
-     *
-     * @return ResponseInterface|Collection|array|object|string
-     *
-     * @throws InvalidConfigException
+     * @param array|string|null $query
+     * @return Response
+     * @throws ConnectionException
      * @throws GuzzleException
      */
-    public function httpGet(string $url, array $query = [])
+    public function get(string $url, $query = null)
     {
-        return $this->request($url, 'GET', ['query' => $query]);
+        return $this->request($url, 'GET', [
+            'query' => $query,
+        ]);
     }
 
     /**
-     * Head request.
+     * Issue a HEAD request to the given URL.
      *
      * @param string $url
-     * @param array $query
-     * @return array|Collection|object|ResponseInterface|string
+     * @param array|string|null $query
+     * @return Response
+     * @throws ConnectionException
      * @throws GuzzleException
-     * @throws InvalidConfigException
      */
-    public function httpHead(string $url, array $query = [])
+    public function head(string $url, $query = null)
     {
-        return $this->request($url, 'HEAD', ['query' => $query]);
+        return $this->request($url, 'HEAD', [
+            'query' => $query,
+        ]);
     }
 
     /**
-     * POST request.
-     *
-     * @param string $url
-     * @param array $data
-     *
-     * @return ResponseInterface|Collection|array|object|string
-     *
-     * @throws InvalidConfigException
-     * @throws GuzzleException
-     */
-    public function httpPost(string $url, array $data = [])
-    {
-        return $this->request($url, 'POST', ['form_params' => $data]);
-    }
-
-    /**
-     * PUT request.
+     * Issue a POST request to the given URL.
      *
      * @param string $url
      * @param array $data
-     *
-     * @return ResponseInterface|Collection|array|object|string
-     *
-     * @throws InvalidConfigException
+     * @return Response
+     * @throws ConnectionException
      * @throws GuzzleException
      */
-    public function httpPut(string $url, array $data = [])
+    public function post(string $url, array $data = [])
     {
-        return $this->request($url, 'PUT', ['form_params' => $data]);
+        return $this->request($url, 'POST', [
+            $this->bodyFormat => $data,
+        ]);
     }
 
     /**
-     * PATCH request.
+     * Issue a PATCH request to the given URL.
      *
      * @param string $url
      * @param array $data
-     *
-     * @return ResponseInterface|Collection|array|object|string
-     *
-     * @throws InvalidConfigException
+     * @return Response
+     * @throws ConnectionException
      * @throws GuzzleException
      */
-    public function httpPatch(string $url, array $data = [])
+    public function patch(string $url, $data = [])
     {
-        return $this->request($url, 'PATCH', ['form_params' => $data]);
+        return $this->request($url, 'PATCH', [
+            $this->bodyFormat => $data,
+        ]);
     }
 
     /**
-     * Delete request.
+     * Issue a PUT request to the given URL.
      *
      * @param string $url
      * @param array $data
-     * @return array|Collection|object|ResponseInterface|string
+     * @return Response
+     * @throws ConnectionException
      * @throws GuzzleException
-     * @throws InvalidConfigException
      */
-    public function httpDelete(string $url, array $data = [])
+    public function put(string $url, $data = [])
     {
-        return $this->request($url, 'DELETE', ['form_params' => $data]);
+        return $this->request($url, 'PUT', [
+            $this->bodyFormat => $data,
+        ]);
     }
 
     /**
-     * JSON request.
+     * Issue a DELETE request to the given URL.
      *
      * @param string $url
      * @param array $data
-     * @param array $query
-     *
-     * @return ResponseInterface|Collection|array|object|string
-     *
-     * @throws InvalidConfigException
+     * @return Response
+     * @throws ConnectionException
      * @throws GuzzleException
      */
-    public function httpPostJson(string $url, array $data = [], array $query = [])
+    public function delete(string $url, $data = [])
     {
-        return $this->request($url, 'POST', ['query' => $query, 'json' => $data]);
-    }
-
-    /**
-     * Put JSON request.
-     *
-     * @param string $url
-     * @param array $data
-     * @param array $query
-     *
-     * @return ResponseInterface|Collection|array|object|string
-     *
-     * @throws InvalidConfigException
-     * @throws GuzzleException
-     */
-    public function httpPutJson(string $url, array $data = [], array $query = [])
-    {
-        return $this->request($url, 'PUT', ['query' => $query, 'json' => $data]);
-    }
-
-    /**
-     * Upload file.
-     *
-     * @param string $url
-     * @param array $files
-     * @param array $form
-     * @param array $query
-     *
-     * @return ResponseInterface|Collection|array|object|string
-     *
-     * @throws InvalidConfigException
-     * @throws GuzzleException
-     */
-    public function httpUpload(string $url, array $files = [], array $form = [], array $query = [])
-    {
-        $multipart = [];
-        $headers = [];
-
-        if (isset($form['filename'])) {
-            $headers = [
-                'Content-Disposition' => 'form-data; name="media"; filename="' . $form['filename'] . '"'
-            ];
-        }
-
-        foreach ($files as $name => $path) {
-            $multipart[] = [
-                'name' => $name,
-                'contents' => fopen($path, 'r'),
-                'headers' => $headers
-            ];
-        }
-
-        foreach ($form as $name => $contents) {
-            $multipart[] = compact('name', 'contents');
-        }
-
-        return $this->request(
-            $url,
-            'POST',
-            ['query' => $query, 'multipart' => $multipart, 'connect_timeout' => 30, 'timeout' => 30, 'read_timeout' => 30]
-        );
+        return $this->request($url, 'DELETE', empty($data) ? [] : [
+            $this->bodyFormat => $data,
+        ]);
     }
 
     /**
@@ -252,36 +176,17 @@ class BaseClient
      * @param string $url
      * @param string $method
      * @param array $options
-     * @param bool $returnRaw
-     *
-     * @return ResponseInterface|Collection|array|object|string
-     *
-     * @throws InvalidConfigException
-     * @throws GuzzleException
+     * @return Response
+     * @throws GuzzleException|ConnectionException
      */
-    public function request(string $url, string $method = 'GET', array $options = [], bool $returnRaw = false)
+    public function request(string $url, string $method = 'GET', array $options = [])
     {
         if (empty($this->middlewares)) {
             $this->registerHttpMiddlewares();
         }
-        $response = $this->performRequest($url, $method, $options);
+        $response = $this->performRequest($method, $url, $options);
         $this->app->events->dispatch(new Events\HttpResponseCreated($response));
-        return $returnRaw ? $response : $this->castResponseToType($response, $this->app->config->get('response_type'));
-    }
-
-    /**
-     * @param string $url
-     * @param string $method
-     * @param array $options
-     *
-     * @return Response
-     *
-     * @throws InvalidConfigException
-     * @throws GuzzleException
-     */
-    public function requestRaw(string $url, string $method = 'GET', array $options = [])
-    {
-        return Response::buildFromPsrResponse($this->request($url, $method, $options, true));
+        return $response;
     }
 
     /**
@@ -290,11 +195,11 @@ class BaseClient
     protected function registerHttpMiddlewares()
     {
         // retry
-        $this->pushMiddleware($this->retryMiddleware(), 'retry');
+        $this->withMiddleware($this->retryMiddleware(), 'retry');
         // access token
-        $this->pushMiddleware($this->accessTokenMiddleware(), 'access_token');
+        $this->withMiddleware($this->accessTokenMiddleware(), 'access_token');
         // log
-        $this->pushMiddleware($this->logMiddleware(), 'log');
+        $this->withMiddleware($this->logMiddleware(), 'log');
     }
 
     /**

@@ -9,7 +9,7 @@ declare(strict_types=1);
  */
 namespace Larva\EasySDK\Events;
 
-use Psr\Http\Message\ResponseInterface;
+use Larva\EasySDK\Http\Response;
 
 /**
  * Class HttpResponseCreated.
@@ -24,9 +24,9 @@ class HttpResponseCreated
     public $response;
 
     /**
-     * @param ResponseInterface $response
+     * @param Response $response
      */
-    public function __construct(ResponseInterface $response)
+    public function __construct(Response $response)
     {
         $this->response = $response;
     }
