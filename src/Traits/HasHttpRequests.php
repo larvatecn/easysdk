@@ -462,14 +462,14 @@ trait HasHttpRequests
     /**
      * Send the request to the given URL.
      *
-     * @param string $method
      * @param string $url
+     * @param string $method
      * @param array $options
      * @return Response
      * @throws ConnectionException
      * @throws GuzzleException
      */
-    public function request(string $method, string $url, array $options = []): Response
+    public function request(string $url, string $method, array $options = []): Response
     {
         if (property_exists($this, 'baseUri') && !is_null($this->baseUri)) {
             $options['base_uri'] = $this->baseUri;

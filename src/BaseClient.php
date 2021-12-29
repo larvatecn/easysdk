@@ -184,7 +184,7 @@ class BaseClient
         if (empty($this->middlewares)) {
             $this->registerHttpMiddlewares();
         }
-        $response = $this->performRequest($method, $url, $options);
+        $response = $this->performRequest($url, $method, $options);
         $this->app->events->dispatch(new Events\HttpResponseCreated($response));
         return $response;
     }
