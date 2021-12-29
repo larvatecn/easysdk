@@ -166,7 +166,7 @@ abstract class AccessToken implements AccessTokenInterface
     public function requestToken(array $credentials)
     {
         $response = $this->sendRequest($credentials);
-        if (empty($result[$this->tokenKey])) {
+        if (empty($response->json($this->tokenKey))) {
             throw new HttpException('Request access_token fail: ' . json_encode($response->json(), JSON_UNESCAPED_UNICODE), $response->toPsrResponse());
         }
         return $response->json();
