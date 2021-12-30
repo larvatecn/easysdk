@@ -490,11 +490,7 @@ trait HasHttpRequests
 
         [$this->pendingBody, $this->pendingFiles] = [null, []];
         try {
-            $response = new Response($this->getHttpClient()->request(strtoupper($method), $url, $this->mergeOptions([
-                'on_stats' => function ($transferStats) {
-                    $this->transferStats = $transferStats;
-                },
-            ], $options, ['handler' => $this->getHandlerStack()])));
+            $response = new Response($this->getHttpClient()->request(strtoupper($method), $url, $options));
             $response->cookies = $this->cookies;
             $response->transferStats = $this->transferStats;
             return $response;
