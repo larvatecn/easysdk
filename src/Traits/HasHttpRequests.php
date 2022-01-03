@@ -150,7 +150,7 @@ trait HasHttpRequests
      */
     public function asJson()
     {
-        return $this->bodyFormat('json')->contentType('application/json');
+        return $this->bodyFormat(RequestOptions::JSON)->contentType('application/json');
     }
 
     /**
@@ -160,7 +160,7 @@ trait HasHttpRequests
      */
     public function asForm()
     {
-        return $this->bodyFormat('form_params')->contentType('application/x-www-form-urlencoded');
+        return $this->bodyFormat(RequestOptions::FORM_PARAMS)->contentType('application/x-www-form-urlencoded');
     }
 
     /**
@@ -170,7 +170,7 @@ trait HasHttpRequests
      */
     public function asMultipart()
     {
-        return $this->bodyFormat('multipart');
+        return $this->bodyFormat(RequestOptions::MULTIPART);
     }
 
     /**
@@ -466,27 +466,31 @@ trait HasHttpRequests
      */
     public function request(string $url, string $method, array $options = []): Response
     {
+        $options = $this->mergeOptions([
+            RequestOptions::ON_STATS => function ($transferStats) {
+                $this->transferStats = $transferStats;
+            },
+        ], $options, ['handler' => $this->getHandlerStack()]);
         if (property_exists($this, 'baseUri') && !is_null($this->baseUri)) {
             $options['base_uri'] = $this->baseUri;
         }
         if (isset($options[$this->bodyFormat])) {
-            if ($this->bodyFormat === 'multipart') {
+            if ($this->bodyFormat === RequestOptions::MULTIPART) {
                 $options[$this->bodyFormat] = $this->parseMultipartBodyFormat($options[$this->bodyFormat]);
-            } elseif ($this->bodyFormat === 'body') {
+                unset($options[RequestOptions::HEADERS]['Content-Type']);//去除无用的
+            } elseif ($this->bodyFormat === RequestOptions::BODY) {
                 $options[$this->bodyFormat] = $this->pendingBody;
             }
             if (is_array($options[$this->bodyFormat])) {
                 $options[$this->bodyFormat] = array_merge($options[$this->bodyFormat], $this->pendingFiles);
             }
+        } else {
+            $options[$this->bodyFormat] = $this->pendingBody;
         }
 
         [$this->pendingBody, $this->pendingFiles] = [null, []];
         try {
-            $response = new Response($this->getHttpClient()->request(strtoupper($method), $url, $this->mergeOptions([
-                'on_stats' => function ($transferStats) {
-                    $this->transferStats = $transferStats;
-                },
-            ], $options, ['handler' => $this->getHandlerStack()])));
+            $response = new Response($this->getHttpClient()->request(strtoupper($method), $url, $options));
             $response->cookies = $this->cookies;
             $response->transferStats = $this->transferStats;
             return $response;
