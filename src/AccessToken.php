@@ -83,27 +83,20 @@ abstract class AccessToken implements AccessTokenInterface
 
     /**
      * @param bool $refresh
-     *
      * @return array
-     *
      * @throws HttpException
      */
     public function getToken(bool $refresh = false): array
     {
         $cacheKey = $this->getCacheKey();
         $cache = $this->getCache();
-
         if (!$refresh && $cache->has($cacheKey) && $result = $cache->get($cacheKey)) {
             return $result;
         }
-
         /** @var array $token */
-        $token = $this->requestToken($this->getCredentials(), true);
-
+        $token = $this->requestToken($this->getCredentials());
         $this->setToken($token[$this->tokenKey], $token['expires_in'] ?? 7200);
-
         $this->app->events->dispatch(new Events\AccessTokenRefreshed($this));
-
         return $token;
     }
 
