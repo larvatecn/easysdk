@@ -9,7 +9,6 @@ declare(strict_types=1);
  */
 namespace Larva\EasySDK\Exceptions;
 
-use Larva\EasySDK\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 
 /**
