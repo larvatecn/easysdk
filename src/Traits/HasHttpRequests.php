@@ -96,6 +96,7 @@ trait HasHttpRequests
      * @var array
      */
     protected static array $defaultOptions = [
+        'http_errors' => false,
     ];
 
     /**
@@ -462,7 +463,7 @@ trait HasHttpRequests
      * @param string $method
      * @param array $options
      * @return Response
-     * @throws ConnectionException|GuzzleException
+     * @throws ConnectionException
      */
     public function request(string $url, string $method, array $options = []): Response
     {

@@ -30,6 +30,7 @@
     "php": "^7.4|^8.0",
     "ext-curl": "*",
     "ext-json": "*",
+    "ext-openssl": "*",
     "guzzlehttp/guzzle": "^6.2 || ^7.0",
     "monolog/monolog": "^1.22 || ^2.0",
     "pimple/pimple": "^3.0",
