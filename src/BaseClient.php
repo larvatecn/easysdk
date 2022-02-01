@@ -63,7 +63,6 @@ class BaseClient
      * @param array|string|null $query
      * @return Response
      * @throws ConnectionException
-     * @throws GuzzleException
      */
     public function get(string $url, $query = null): Response
     {
@@ -79,7 +78,6 @@ class BaseClient
      * @param mixed $query
      * @return Response
      * @throws ConnectionException
-     * @throws GuzzleException
      */
     public function head(string $url, $query = null): Response
     {
@@ -95,7 +93,6 @@ class BaseClient
      * @param mixed $data
      * @return Response
      * @throws ConnectionException
-     * @throws GuzzleException
      */
     public function post(string $url, array $data = []): Response
     {
@@ -111,7 +108,6 @@ class BaseClient
      * @param mixed $data
      * @return Response
      * @throws ConnectionException
-     * @throws GuzzleException
      */
     public function patch(string $url, $data = []): Response
     {
@@ -127,7 +123,6 @@ class BaseClient
      * @param mixed $data
      * @return Response
      * @throws ConnectionException
-     * @throws GuzzleException
      */
     public function put(string $url, $data = []): Response
     {
@@ -143,13 +138,38 @@ class BaseClient
      * @param mixed $data
      * @return Response
      * @throws ConnectionException
-     * @throws GuzzleException
      */
     public function delete(string $url, $data = []): Response
     {
         return $this->request($url, 'DELETE', empty($data) ? [] : [
             $this->bodyFormat => $data,
         ]);
+    }
+
+    /**
+     * Issue a GET request to the given URL.
+     *
+     * @param string $url
+     * @param array|string|null $query
+     * @return Response
+     * @throws ConnectionException
+     */
+    public function getJson(string $url, $query = null): Response
+    {
+        return $this->acceptJson()->get($url, $query);
+    }
+
+    /**
+     * Issue a POST request to the given URL.
+     *
+     * @param string $url
+     * @param mixed $data
+     * @return Response
+     * @throws ConnectionException
+     */
+    public function postJson(string $url, array $data = []): Response
+    {
+        return $this->asJson()->acceptJson()->post($url, $data);
     }
 
     /**
@@ -176,7 +196,7 @@ class BaseClient
      * @param string $method
      * @param array $options
      * @return Response
-     * @throws GuzzleException|ConnectionException
+     * @throws ConnectionException
      */
     public function request(string $url, string $method = 'GET', array $options = []): Response
     {

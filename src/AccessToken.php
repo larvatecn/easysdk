@@ -21,6 +21,9 @@ use Larva\EasySDK\Traits\HasHttpRequests;
 use Larva\EasySDK\Traits\InteractsWithCache;
 use Psr\Http\Message\RequestInterface;
 
+/**
+ * AccessToken
+ */
 abstract class AccessToken implements AccessTokenInterface
 {
     use HasHttpRequests;
@@ -93,7 +96,6 @@ abstract class AccessToken implements AccessTokenInterface
         if (!$refresh && $cache->has($cacheKey) && $result = $cache->get($cacheKey)) {
             return $result;
         }
-        /** @var array $token */
         $token = $this->requestToken($this->getCredentials());
         $this->setToken($token[$this->tokenKey], $token['expires_in'] ?? 7200);
         $this->app->events->dispatch(new Events\AccessTokenRefreshed($this));
@@ -148,13 +150,8 @@ abstract class AccessToken implements AccessTokenInterface
     /**
      * @param RequestInterface $request
      * @param array $requestOptions
-     *
      * @return RequestInterface
-     *
-     * @throws HttpException
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws InvalidArgumentException
-     * @throws RuntimeException|GuzzleException
      */
     public function applyToRequest(RequestInterface $request, array $requestOptions = []): RequestInterface
     {
@@ -168,7 +165,7 @@ abstract class AccessToken implements AccessTokenInterface
      *
      * @param array $credentials
      * @return Response
-     * @throws GuzzleException|ConnectionException
+     * @throws ConnectionException
      */
     protected function sendRequest(array $credentials): Response
     {
@@ -199,6 +196,7 @@ abstract class AccessToken implements AccessTokenInterface
     /**
      * 获取令牌访问点
      * @return string
+     * @throws InvalidArgumentException
      */
     public function getEndpoint(): string
     {
