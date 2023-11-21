@@ -16,9 +16,8 @@ use Countable;
 use IteratorAggregate;
 use JsonSerializable;
 use Larva\EasySDK\Contracts\Arrayable;
-use Serializable;
 
-class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Serializable, Arrayable
+class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Arrayable
 {
     /**
      * The collection data.
@@ -238,7 +237,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *
      * @return string the string representation of the object or null
      */
-    public function serialize(): string
+    public function __serialize()
     {
         return serialize($this->items);
     }
@@ -285,7 +284,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *
      * @return mixed|void
      */
-    public function unserialize($serialized)
+    public function __unserialize($serialized)
     {
         return $this->items = unserialize($serialized);
     }

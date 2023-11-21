@@ -229,7 +229,7 @@ class Response implements ArrayAccess
      * @param string $offset
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->json()[$offset]);
     }
@@ -240,7 +240,7 @@ class Response implements ArrayAccess
      * @param string $offset
      * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->json()[$offset];
     }
@@ -254,7 +254,7 @@ class Response implements ArrayAccess
      *
      * @throws \LogicException
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new LogicException('Response data may not be mutated using array access.');
     }
@@ -267,7 +267,7 @@ class Response implements ArrayAccess
      *
      * @throws \LogicException
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new LogicException('Response data may not be mutated using array access.');
     }
@@ -312,7 +312,7 @@ class Response implements ArrayAccess
             $filename .= File::getStreamExt($contents);
         }
 
-        file_put_contents($directory.'/'.$filename, $contents);
+        file_put_contents($directory . '/' . $filename, $contents);
 
         return $filename;
     }
