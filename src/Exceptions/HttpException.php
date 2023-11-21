@@ -37,8 +37,6 @@ class HttpException extends Exception
 
         $this->response = $response;
 
-        if ($response) {
-            $response->getBody()->rewind();
-        }
+        $response?->getBody()->rewind();
     }
 }

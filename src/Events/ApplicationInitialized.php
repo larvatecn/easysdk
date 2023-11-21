@@ -17,7 +17,7 @@ class ApplicationInitialized
     /**
      * @var ServiceContainer
      */
-    public $app;
+    public ServiceContainer $app;
 
     /**
      * @param ServiceContainer $app

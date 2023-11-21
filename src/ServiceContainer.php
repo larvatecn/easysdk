@@ -30,24 +30,24 @@ use Pimple\Container;
 class ServiceContainer extends Container
 {
     /**
-     * @var string
+     * @var string|null
      */
-    protected $id;
+    protected ?string $id;
 
     /**
      * @var array
      */
-    protected $providers = [];
+    protected array $providers = [];
 
     /**
      * @var array
      */
-    protected $defaultConfig = [];
+    protected array $defaultConfig = [];
 
     /**
      * @var array
      */
-    protected $userConfig = [];
+    protected array $userConfig = [];
 
     /**
      * Constructor.
@@ -164,7 +164,7 @@ class ServiceContainer extends Container
     /**
      * @param array $providers
      */
-    public function registerProviders(array $providers)
+    public function registerProviders(array $providers): void
     {
         foreach ($providers as $provider) {
             parent::register(new $provider());

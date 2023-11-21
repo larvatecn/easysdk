@@ -55,7 +55,7 @@ class AES
      *
      * @return string
      */
-    public static function getMode($key)
+    public static function getMode($key): string
     {
         return 'aes-'.(8 * strlen($key)).'-cbc';
     }
@@ -63,7 +63,7 @@ class AES
     /**
      * @param string $key
      */
-    public static function validateKey(string $key)
+    public static function validateKey(string $key): void
     {
         if (!in_array(strlen($key), [16, 24, 32], true)) {
             throw new \InvalidArgumentException(sprintf('Key length must be 16, 24, or 32 bytes; got key len (%s).', strlen($key)));
@@ -75,7 +75,7 @@ class AES
      *
      * @throws \InvalidArgumentException
      */
-    public static function validateIv(string $iv)
+    public static function validateIv(string $iv): void
     {
         if (!empty($iv) && 16 !== strlen($iv)) {
             throw new \InvalidArgumentException('IV length must be 16 bytes.');

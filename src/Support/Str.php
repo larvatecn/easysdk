@@ -116,7 +116,7 @@ class Str
      *
      * @return string
      */
-    public static function quickRandom($length = 16)
+    public static function quickRandom($length = 16): string
     {
         $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -130,7 +130,7 @@ class Str
      *
      * @return string
      */
-    public static function upper($value)
+    public static function upper($value): string
     {
         return mb_strtoupper($value);
     }
@@ -142,7 +142,7 @@ class Str
      *
      * @return string
      */
-    public static function title($value)
+    public static function title($value): string
     {
         return mb_convert_case($value, MB_CASE_TITLE, 'UTF-8');
     }

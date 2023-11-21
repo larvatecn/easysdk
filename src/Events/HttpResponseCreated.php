@@ -22,7 +22,7 @@ class HttpResponseCreated
     /**
      * @var Response
      */
-    public $response;
+    public Response $response;
 
     /**
      * @param Response $response

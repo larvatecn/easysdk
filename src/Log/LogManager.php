@@ -37,7 +37,7 @@ class LogManager implements LoggerInterface
     /**
      * @var ServiceContainer
      */
-    protected $app;
+    protected ServiceContainer $app;
 
     /**
      * The array of resolved channels.
